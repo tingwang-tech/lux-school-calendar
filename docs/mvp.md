@@ -4,6 +4,10 @@
 
 "Never miss an open day or enrollment deadline at Luxembourg international schools."
 
+## Live
+
+https://lux-school-calendar.vercel.app
+
 ## Problem
 
 International families in Luxembourg track school dates manually: bookmarking pages, checking back, hoping they don't miss an announcement. We are not aware of any unified subscription service that automatically sends calendar invites for school dates across multiple Luxembourg international schools.
@@ -20,38 +24,85 @@ A browsable calendar of school dates that parents can explore and add to their o
 Parent sees upcoming school events immediately — no signup required.
 
 **Step 2 — Filter**
-- School type first: International or Local (Luxembourgish)
-- Then school: pick from list filtered by type
+- School type first: International / European / Local public
+- Then school: list filtered by type
 - Then event type: auto-filtered by school type
-  - International: open days, enrollment windows, school holidays
-  - Local: school holidays only (enrollment is via commune, not school visits)
+  - International / European: open days, enrollment windows (holidays P1)
+  - Local public: school holidays only (enrollment is via commune, not school visits)
 
-**Step 3 — Browse event widgets**
-Each card shows: school, event type, date, time, location, source link.
-Only events within the current school year are shown (Sept–July, rolling each September). Past events within that window are grayed out and non-clickable. Future events have an "Add to Calendar" button — downloads the `.ics`, no email required. Events before the current school year are not shown.
+**Step 3 — Browse event cards**
+Each card shows: event type badge, level badge (Primary / Secondary / All levels), date or date range, school, location, source link.
+- Current school year only (Sept–July, rolling each September)
+- Future events: "Add to Calendar" button → Apple Calendar (.ics) or Google Calendar (web link)
+- Past events within year: grayed out, non-clickable
+- Events outside current school year: not shown
+- Holiday periods shown as date range: e.g. "16 Jul – 14 Sep 2026"
+- All .ics events marked as free (TRANSP:TRANSPARENT)
+- Verification banner shown when open day or enrollment events are in view
 
-**Step 4 — Feedback prompt**
-Below the events: "Tell us what you'd want more of." Free-text input + Submit.
-Submissions go to operator email (tzutingtw@gmail.com) via Resend.
-No account or subscription needed to submit.
+**Step 4 — Feedback**
+Below the events: "Tell us what you'd want more of." Free-text + Submit.
+Submissions go to tzutingtw@gmail.com via Formspree (form ID: mbdvgwre).
+No account needed to submit.
 
-**Step 5 (V2) — Email subscription**
-Paid tier. Parents subscribe to receive new dates automatically as they are announced.
+**Step 5 (V2) — Paid email subscription**
+Parents subscribe to receive new dates automatically as announced. Resend handles .ics delivery.
+
+## School types and event rules
+
+| Type | Event types shown | Notes |
+|---|---|---|
+| International | Open days, enrollment | Holidays P1 — not yet verified per school |
+| European | Open days, enrollment | Holidays P1 — not yet verified per school |
+| Local public | School holidays only | MEN-verified, authoritative |
+
+## Primary school focus
+
+- Primary level events: highlighted with purple badge, full "Add to Calendar" button
+- Secondary level events: grey badge, visible but not interactive (sets expectation)
+- Both/All levels: shown as primary (covers primary audience)
 
 ## Date types
 
-**P0 — launch with these:**
-- Open days (primary discovery moment for parents)
-- Enrollment / application deadlines (highest stakes — miss it, wait a year)
-- School holidays (sourced from MEN, relevant to all families)
+**P0 — live:**
+- Open days (primary school focus; secondary shown as coming soon)
+- Enrollment / application deadlines
+- School holidays (local public only — MEN calendar)
 
-**P1 — add after launch:**
-- Term start and end dates
+**P1 — after launch:**
+- International and European school holidays (need per-school verification)
+- Term start/end dates
 - Orientation / welcome days
 - Waiting list opening dates
 - Luxembourg national public holidays
 
-## Out of scope for v1
+## Schools
+
+**International (11):**
+ISL Luxembourg, St George's International School, OTR International School, Vauban – Lycée Français de Luxembourg, Lycée – International School Michel Lucius, Ecole internationale Gaston Thorn, Lënster Lycée International School, École Internationale Anne Beffort, École Internationale de Differdange et Esch-sur-Alzette, École Internationale de Mondorf-les-Bains, Lycée Edward Steichen (LESC)
+
+**European (2):**
+European School Luxembourg I (Kirchberg), European School Luxembourg II (Mamer)
+
+**Local public (1):**
+Local public school (commune)
+
+## Data sources — rules
+
+- atschool.lu is NOT used as an authoritative source
+- Each event must link to the exact school page where the date appears (not the homepage)
+- MEN calendar (men.public.lu/en/vacances-scolaires.html) is authoritative for local public holidays
+- Every event requires a `lastVerified` date
+
+**Verified open days in system:**
+- OTR: Primary 6 Mar 2026, Secondary 6 Feb 2026, All levels 18 Apr 2026 — `otrschool.lu/open-days/`
+- EIMLB: Primary 28 Feb 2026 — `eimlb.lu/fr/porte-ouverte/journee-portes-ouvertes-a-lecole-primaire/`
+- LLIS: All levels 27 Feb 2026 — atschool.lu (official site cert expired)
+
+**Pending verification (official pages not reachable):**
+ISL, St George's, Michel Lucius, Vauban, Anne Beffort, Gaston Thorn, LESC, European Schools I & II
+
+## Out of scope for V1
 
 - Email subscriptions (V2)
 - Parent login or accounts
@@ -59,55 +110,43 @@ Paid tier. Parents subscribe to receive new dates automatically as they are anno
 - Reviews or ratings
 - French language support
 - Direct enrollment services
-
-## Data sources
-
-- https://atschool.lu/en/international-schools-open-days-2025/
-- https://men.public.lu/en/vacances-scolaires.html (official school holidays)
-- Individual school websites (manually verified before publishing)
-
-## Data maintenance
-
-School data and dates live in Airtable. A human verifies accuracy before any event is published. Each event stores source URL and last-verified date. Events are published manually — no automated publishing in v1.
+- Airtable integration (V1 data lives in events.ts)
+- Automated scraping (V1 is fully manual)
 
 ## Design decisions
 
-- **Style**: Warm minimal — off-white background, purple accents, soft borders
+- **Style**: Warm minimal — off-white (#FDFAF6) background, purple (#534AB7) accents, soft borders
 - **Event window**: Current school year only (Sept–July). No all-time history.
 - **Past events**: Grayed out + non-clickable within the current year window
-- **Feedback tool**: Formspree — zero code, form posts directly to operator email
-- **Email delivery (V2)**: Resend — transactional, supports `.ics` attachments natively
+- **Feedback tool**: Formspree (mbdvgwre) — zero backend code
+- **Calendar format**: .ics (Apple) + Google Calendar web link
+- **Email delivery (V2)**: Resend — transactional, supports .ics natively
 
 ## Stack
 
-- Next.js on Vercel (frontend + API routes)
-- Vercel cron (weekly scraper — detects new events, writes to Airtable as draft)
-- Airtable (schools, events, feedback log)
-- Resend (feedback email forwarding to operator; `.ics` delivery in V2)
-
-**Why Resend over Brevo:** This product sends transactional emails (event-triggered `.ics` invites), not marketing newsletters. Resend is purpose-built for transactional sends from Next.js, supports `.ics` attachments natively, and keeps the integration simple. Brevo's strength is bulk marketing and CRM — not needed here.
+- Next.js 16 in `/app` subdirectory
+- Vercel — auto-deploys from `main`; root directory set to `app`; framework: nextjs
+- Formspree mbdvgwre — feedback to tzutingtw@gmail.com
+- Resend — V2 only
 
 ## Pilot success measures
 
 - 20+ visitors browse the event calendar
 - 10+ feedback submissions received
 - "Add to Calendar" used at least once per event card
-- Zero wrong dates published (our system's responsibility; source changes are out of scope)
+- Zero wrong dates published due to our system
 - Clear signal from feedback on what parents want next
 
-## Risk & compliance (v1)
+## Risk & compliance (V1)
 
 **Data protection (GDPR / CNPD)**
-Feedback submissions collect free-text only — no email address required unless the parent chooses to include one. No personal data stored beyond what parents voluntarily write. When V2 email subscription is added, explicit consent, unsubscribe, and CNPD rights handling will be required.
+Feedback submissions collect free-text only — no email required unless parent volunteers it. No personal data stored. V2 email subscription will require explicit consent, unsubscribe link, and CNPD rights notice.
 
 **Accuracy and liability**
-All dates are derived from public sources with human verification before publishing. Every event card and `.ics` description includes: "Informational — always confirm on the school's official site."
+All dates verified from official school sources before publishing. Every card and .ics description states: "Informational — always confirm on the school's official site." Verification banner shown above all open day and enrollment events.
 
-**Content reuse / intellectual property**
-We reuse only factual event data (date, time, type, source link). We do not republish article text or bulk-copy restricted content. Source link is always shown on the card.
+**Content reuse**
+Only factual event data reused (date, time, type, source link). Source link always shown. No article text republished.
 
-**Positioning vs schools**
-We are not affiliated with or endorsed by any listed school. Site copy states this explicitly.
-
-**Operational assumptions**
-Weekly scraping cadence is a v1 assumption. We will revisit if sources update more frequently or if parents report missed dates.
+**Positioning**
+Not affiliated with any listed school. Stated explicitly on site.
