@@ -27,7 +27,8 @@ Parent sees upcoming school events immediately — no signup required.
 - School type first: International / European / Local public
 - Then school: list filtered by type
 - Then event type: auto-filtered by school type
-  - International / European: open days, enrollment windows (holidays P1)
+  - International: open days, enrollment, holidays (MEN-following schools only)
+  - European: open days, enrollment (holidays P1)
   - Local public: school holidays only (enrollment is via commune, not school visits)
 
 **Step 3 — Browse event cards**
@@ -38,7 +39,7 @@ Each card shows: event type badge, level badge (Primary / Secondary / All levels
 - Events outside current school year: not shown
 - Holiday periods shown as date range: e.g. "16 Jul – 14 Sep 2026"
 - All .ics events marked as free (TRANSP:TRANSPARENT)
-- Verification banner shown when open day or enrollment events are in view
+- Verification banner: "Dates are being verified school by school — always check the source link before making plans."
 
 **Step 4 — Feedback**
 Below the events: "Tell us what you'd want more of." Free-text + Submit.
@@ -52,8 +53,8 @@ Parents subscribe to receive new dates automatically as announced. Resend handle
 
 | Type | Event types shown | Notes |
 |---|---|---|
-| International | Open days, enrollment | Holidays P1 — not yet verified per school |
-| European | Open days, enrollment | Holidays P1 — not yet verified per school |
+| International | Open days, enrollment, holidays | Holidays shown for MEN-following schools only (Michel Lucius, LLIS, Anne Beffort, Mondorf, LESC); others P1 |
+| European | Open days, enrollment | Holidays P1 — European calendar not yet integrated |
 | Local public | School holidays only | MEN-verified, authoritative |
 
 ## Primary school focus
@@ -67,10 +68,11 @@ Parents subscribe to receive new dates automatically as announced. Resend handle
 **P0 — live:**
 - Open days (primary school focus; secondary shown as coming soon)
 - Enrollment / application deadlines
-- School holidays (local public only — MEN calendar)
+- School holidays — MEN calendar for schools following the national calendar (local public + public international: Michel Lucius, LLIS, Anne Beffort, Mondorf, LESC)
 
 **P1 — after launch:**
-- International and European school holidays (need per-school verification)
+- Holidays for schools with their own calendar (ISL, St George's, OTR, Vauban)
+- European school holidays (European calendar)
 - Term start/end dates
 - Orientation / welcome days
 - Waiting list opening dates
@@ -91,7 +93,7 @@ Local public school (commune)
 
 - atschool.lu is NOT used as an authoritative source
 - Each event must link to the exact school page where the date appears (not the homepage)
-- MEN calendar (men.public.lu/en/vacances-scolaires.html) is authoritative for local public holidays
+- MEN calendar (men.public.lu/en/vacances-scolaires.html) is authoritative for holidays at schools following the national calendar
 - Every event requires a `lastVerified` date
 
 **Verified open days in system:**

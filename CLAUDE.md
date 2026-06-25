@@ -26,8 +26,8 @@ Three types — the filter gates available event types:
 
 | Type | Schools | Event types shown |
 |---|---|---|
-| International | ISL, St George's, OTR, Vauban, Michel Lucius, Gaston Thorn, LLIS, Anne Beffort, EIDE, EIMLB, LESC | Open days, enrollment, holidays (holidays P1) |
-| European | European School I (Kirchberg), European School II (Mamer) | Open days, enrollment, holidays (holidays P1) |
+| International | ISL, St George's, OTR, Vauban, Michel Lucius, Gaston Thorn, LLIS, Anne Beffort, EIDE, EIMLB, LESC | Open days, enrollment, holidays (MEN-following schools only) |
+| European | European School I (Kirchberg), European School II (Mamer) | Open days, enrollment (holidays P1) |
 | Local public | Local public school (commune) | School holidays only (MEN calendar) |
 
 ## Date types
@@ -35,10 +35,11 @@ Three types — the filter gates available event types:
 **P0 (live):**
 - Open days — primary focus; primary school level highlighted, secondary shown as "coming soon"
 - Enrollment / application deadlines
-- School holidays — MEN-verified for local public schools only; international/european holidays are P1
+- School holidays — MEN-verified for schools following the national calendar (local public + public international schools: Michel Lucius, LLIS, Anne Beffort, Mondorf, LESC)
 
 **P1 (after launch):**
-- International and European school holidays (need per-school verification)
+- International school holidays for schools with their own calendar (ISL, St George's, OTR, Vauban)
+- European school holidays (European calendar)
 - Term start/end dates
 - Orientation / welcome days
 - Waiting list opening dates
@@ -61,7 +62,7 @@ Three types — the filter gates available event types:
 - "Add to Calendar" opens dropdown: Apple Calendar (.ics download) or Google Calendar (web link)
 - All events marked `TRANSP:TRANSPARENT` — shows as free, not busy
 - Source link on every card → exact school page, not homepage
-- Verification banner shown above open day / enrollment events: "being verified school by school"
+- Verification banner shown above open day / enrollment events: "Dates are being verified school by school — always check the source link before making plans."
 - Past events within current school year: grayed, non-clickable
 - Events outside current school year: not shown
 
@@ -70,7 +71,15 @@ Three types — the filter gates available event types:
 Events are seeded in `app/src/lib/events.ts`. Each event requires:
 - Verified source URL (exact page, not school homepage)
 - `lastVerified` date
-- `level`: primary | secondary | both
+- `level`: primary | secondary | both (optional for holidays)
+- `title`: event name (optional; used for holidays, e.g. "All Saints holidays")
+- `menPeriodId`: links MEN holiday events across schools for UI grouping (auto-generated)
+
+Schools have a `holidayCalendar` property indicating which calendar they follow:
+- `MEN`: Luxembourg national calendar (men.public.lu)
+- `European`: European Schools calendar
+- `AEFE`: French school network calendar (Vauban)
+- `own`: School-specific calendar (ISL, St George's, OTR)
 
 Schools to verify and add (official pages needed): ISL, St George's, Michel Lucius, Vauban, Anne Beffort, Gaston Thorn, LESC, both European Schools.
 
@@ -96,7 +105,7 @@ Target infrastructure cost: under €20/year.
 - `.ics` format — works for Apple Calendar, Google Calendar, Outlook; no install required
 - School type gates event types: local public → holidays only; international/european → all types
 - atschool.lu is NOT used as a source — individual school official pages only
-- MEN calendar (men.public.lu) is the authoritative source for local public school holidays
+- MEN calendar (men.public.lu) is the authoritative source for holidays at schools following the national calendar
 - No Airtable in V1 — events.ts is the data layer; simpler to ship and verify manually
 - Weekly cadence is a V2 scraping assumption; V1 is fully manual
 
