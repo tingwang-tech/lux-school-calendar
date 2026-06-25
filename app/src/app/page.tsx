@@ -203,7 +203,7 @@ export default function Home() {
       {showVerifyingBanner && (
         <div className="flex gap-3 bg-[#F1EFE8] border border-[#D3D1C7] rounded-xl px-4 py-3 mb-6 text-xs text-[#5F5E5A]">
           <span className="mt-0.5">⚠</span>
-          <span>Always check the source link on each event before making plans.</span>
+          <span>Dates are being verified school by school — always check the source link before making plans.</span>
         </div>
       )}
 
