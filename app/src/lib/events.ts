@@ -1,6 +1,7 @@
 export type SchoolType = "international" | "european" | "local-public"
 export type EventType = "open-day" | "enrollment" | "holiday"
 export type Level = "primary" | "secondary" | "both"
+export type HolidayCalendar = "MEN" | "European" | "AEFE" | "own"
 
 export interface SchoolEvent {
   id: string
@@ -8,33 +9,35 @@ export interface SchoolEvent {
   schoolType: SchoolType
   eventType: EventType
   level?: Level
+  title?: string
   date: string
   endDate?: string
   time?: string
   location?: string
   sourceUrl: string
   lastVerified: string
+  menPeriodId?: string
 }
 
-export const SCHOOLS: { name: string; type: SchoolType }[] = [
+export const SCHOOLS: { name: string; type: SchoolType; holidayCalendar: HolidayCalendar }[] = [
   // International — private
-  { name: "ISL Luxembourg", type: "international" },
-  { name: "St George's International School", type: "international" },
-  { name: "OTR International School", type: "international" },
-  { name: "Vauban – Lycée Français de Luxembourg", type: "international" },
+  { name: "ISL Luxembourg", type: "international", holidayCalendar: "own" },
+  { name: "St George's International School", type: "international", holidayCalendar: "own" },
+  { name: "OTR International School", type: "international", holidayCalendar: "own" },
+  { name: "Vauban – Lycée Français de Luxembourg", type: "international", holidayCalendar: "AEFE" },
   // International — public with international curriculum
-  { name: "Lycée – International School Michel Lucius", type: "international" },
-  { name: "Ecole internationale Gaston Thorn", type: "international" },
-  { name: "Lënster Lycée International School", type: "international" },
-  { name: "École Internationale Anne Beffort", type: "international" },
-  { name: "École Internationale de Differdange et Esch-sur-Alzette", type: "international" },
-  { name: "École Internationale de Mondorf-les-Bains", type: "international" },
-  { name: "Lycée Edward Steichen (LESC)", type: "international" },
+  { name: "Lycée – International School Michel Lucius", type: "international", holidayCalendar: "MEN" },
+  { name: "Ecole internationale Gaston Thorn", type: "international", holidayCalendar: "European" },
+  { name: "Lënster Lycée International School", type: "international", holidayCalendar: "MEN" },
+  { name: "École Internationale Anne Beffort", type: "international", holidayCalendar: "MEN" },
+  { name: "École Internationale de Differdange et Esch-sur-Alzette", type: "international", holidayCalendar: "European" },
+  { name: "École Internationale de Mondorf-les-Bains", type: "international", holidayCalendar: "MEN" },
+  { name: "Lycée Edward Steichen (LESC)", type: "international", holidayCalendar: "MEN" },
   // European
-  { name: "European School Luxembourg I (Kirchberg)", type: "european" },
-  { name: "European School Luxembourg II (Mamer)", type: "european" },
+  { name: "European School Luxembourg I (Kirchberg)", type: "european", holidayCalendar: "European" },
+  { name: "European School Luxembourg II (Mamer)", type: "european", holidayCalendar: "European" },
   // Local public
-  { name: "Local public school (commune)", type: "local-public" },
+  { name: "Local public school (commune)", type: "local-public", holidayCalendar: "MEN" },
 ]
 
 export const SCHOOL_TYPE_LABELS: Record<SchoolType, string> = {
@@ -95,23 +98,47 @@ export function formatDateRange(date: string, endDate?: string): string {
   return `${fmtShort(start)} – ${fmtFull(end)}`
 }
 
-// MEN official holidays 2025-2026 — local public schools only
-// International/European school holidays not yet verified per school (P1)
+// MEN national holiday calendar — authoritative source for Luxembourg public schools
+// and international/public schools that follow the national calendar
 const MEN_SOURCE = "https://men.public.lu/en/vacances-scolaires.html"
 const MEN_VERIFIED = "2026-06-20"
 
-function makeLocalHolidays(idPrefix: string, startDate: string, endDate: string): SchoolEvent[] {
-  return [{
-    id: idPrefix,
-    school: "Local public school (commune)",
-    schoolType: "local-public",
-    eventType: "holiday",
-    date: startDate,
-    endDate,
+export type MenPeriod = {
+  id: string
+  name: string
+  date: string
+  endDate: string
+}
+
+export const MEN_PERIODS: MenPeriod[] = [
+  { id: "allsaints-2526", name: "All Saints holidays", date: "2025-11-01", endDate: "2025-11-09" },
+  { id: "xmas-2526", name: "Christmas holidays", date: "2025-12-20", endDate: "2026-01-04" },
+  { id: "carnival-2526", name: "Carnival holidays", date: "2026-02-14", endDate: "2026-02-22" },
+  { id: "easter-2526", name: "Easter holidays", date: "2026-03-28", endDate: "2026-04-12" },
+  { id: "pentecost-2526", name: "Pentecost holidays", date: "2026-05-23", endDate: "2026-05-31" },
+  { id: "summer-2526", name: "Summer holidays", date: "2026-07-16", endDate: "2026-09-14" },
+]
+
+const MEN_SCHOOLS = SCHOOLS.filter((s) => s.holidayCalendar === "MEN")
+
+function slugify(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 24).replace(/-$/, "")
+}
+
+const MEN_HOLIDAY_EVENTS: SchoolEvent[] = MEN_SCHOOLS.flatMap((school) =>
+  MEN_PERIODS.map((period) => ({
+    id: `hol-men-${period.id}-${slugify(school.name)}`,
+    school: school.name,
+    schoolType: school.type,
+    eventType: "holiday" as EventType,
+    title: period.name,
+    date: period.date,
+    endDate: period.endDate,
     sourceUrl: MEN_SOURCE,
     lastVerified: MEN_VERIFIED,
-  }]
-}
+    menPeriodId: period.id,
+  }))
+)
 
 export const SEED_EVENTS: SchoolEvent[] = [
 
@@ -441,11 +468,7 @@ export const SEED_EVENTS: SchoolEvent[] = [
     lastVerified: "2026-06-25",
   },
 
-  // ── MEN holidays 2025-2026 — local public schools only ────────────────────
-  ...makeLocalHolidays("hol-allsaints", "2025-11-01", "2025-11-09"),
-  ...makeLocalHolidays("hol-xmas", "2025-12-20", "2026-01-04"),
-  ...makeLocalHolidays("hol-carnival", "2026-02-14", "2026-02-22"),
-  ...makeLocalHolidays("hol-easter", "2026-03-28", "2026-04-12"),
-  ...makeLocalHolidays("hol-pentecost", "2026-05-23", "2026-05-31"),
-  ...makeLocalHolidays("hol-summer", "2026-07-16", "2026-09-14"),
+  // ── MEN holiday events — auto-generated for all MEN-calendar schools ───────
+  // Covers: Michel Lucius, LLIS, Anne Beffort, Mondorf, LESC, local public
+  ...MEN_HOLIDAY_EVENTS,
 ]

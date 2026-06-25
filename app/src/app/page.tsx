@@ -12,7 +12,10 @@ import {
   formatDateRange,
   type SchoolType,
   type EventType,
+  type SchoolEvent,
 } from "@/lib/events"
+
+type DisplayEvent = SchoolEvent & { groupedSchools?: string[] }
 
 function toIcsDate(dateStr: string, time?: string): string {
   const d = dateStr.replace(/-/g, "")
@@ -104,7 +107,6 @@ export default function Home() {
       if (!isInCurrentSchoolYear(e.date)) return false
       if (schoolType !== "all" && e.schoolType !== schoolType) return false
       if (schoolType === "local-public" && e.eventType !== "holiday") return false
-      if ((e.schoolType === "international" || e.schoolType === "european") && e.eventType === "holiday") return false
       if (selectedSchool !== "all" && e.school !== selectedSchool) return false
       if (selectedEventType !== "all" && e.eventType !== selectedEventType) return false
       return true
@@ -114,8 +116,21 @@ export default function Home() {
     return [...future, ...past]
   }, [schoolType, selectedSchool, selectedEventType])
 
+  // When no school is selected, collapse MEN holiday duplicates into one card per period
+  const displayEvents = useMemo((): DisplayEvent[] => {
+    if (selectedSchool !== "all") return events
+    const seen = new Set<string>()
+    return events.flatMap((event) => {
+      if (!event.menPeriodId) return [event]
+      if (seen.has(event.menPeriodId)) return []
+      seen.add(event.menPeriodId)
+      const schools = events.filter((e) => e.menPeriodId === event.menPeriodId).map((e) => e.school)
+      return [{ ...event, groupedSchools: schools }]
+    })
+  }, [events, selectedSchool])
+
   // Show verification banner when any open day or enrollment events are in view
-  const showVerifyingBanner = events.some(
+  const showVerifyingBanner = displayEvents.some(
     (e) => e.eventType === "open-day" || e.eventType === "enrollment"
   )
 
@@ -188,18 +203,18 @@ export default function Home() {
       {showVerifyingBanner && (
         <div className="flex gap-3 bg-[#F1EFE8] border border-[#D3D1C7] rounded-xl px-4 py-3 mb-6 text-xs text-[#5F5E5A]">
           <span className="mt-0.5">⚠</span>
-          <span>Open day and enrollment dates are being verified school by school. Always check the source link on each event before making plans.</span>
+          <span>Always check the source link on each event before making plans.</span>
         </div>
       )}
 
       {/* Event cards */}
       <div className="flex flex-col gap-3 mb-14">
-        {events.length === 0 && (
+        {displayEvents.length === 0 && (
           <div className="text-sm text-[#888780] bg-[#F1EFE8] rounded-xl px-5 py-6">
             No events for this selection yet — let us know below what you&apos;re looking for.
           </div>
         )}
-        {events.map((event) => {
+        {displayEvents.map((event) => {
           const past = isPast(event.date)
           const isOpen = openCalendarId === event.id
           return (
@@ -220,9 +235,22 @@ export default function Home() {
                     )}
                   </div>
                   <p className={`text-sm font-medium mb-0.5 ${past ? "text-[#888780]" : "text-[#2C2C2A]"}`}>
-                    {formatDateRange(event.date, event.endDate)}
+                    {event.title ? event.title : formatDateRange(event.date, event.endDate)}
                   </p>
-                  <p className={`text-sm ${past ? "text-[#B4B2A9]" : "text-[#888780]"}`}>{event.school}</p>
+                  {event.title && (
+                    <p className={`text-xs mb-0.5 ${past ? "text-[#B4B2A9]" : "text-[#888780]"}`}>
+                      {formatDateRange(event.date, event.endDate)}
+                    </p>
+                  )}
+                  {event.groupedSchools ? (
+                    <p className={`text-xs mt-0.5 ${past ? "text-[#B4B2A9]" : "text-[#888780]"}`}>
+                      {event.groupedSchools.length <= 3
+                        ? event.groupedSchools.join(" · ")
+                        : `${event.groupedSchools.slice(0, 2).join(" · ")} +${event.groupedSchools.length - 2} more`}
+                    </p>
+                  ) : (
+                    <p className={`text-sm ${past ? "text-[#B4B2A9]" : "text-[#888780]"}`}>{event.school}</p>
+                  )}
                   {event.location && !event.endDate && (
                     <p className={`text-xs mt-0.5 ${past ? "text-[#B4B2A9]" : "text-[#888780]"}`}>{event.location}</p>
                   )}
