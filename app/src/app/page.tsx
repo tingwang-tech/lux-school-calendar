@@ -7,12 +7,15 @@ import {
   SCHOOL_TYPE_LABELS,
   EVENT_TYPE_LABELS,
   LEVEL_LABELS,
-  isInCurrentSchoolYear,
+  SCHOOL_YEARS,
+  isInSchoolYear,
+  defaultSchoolYear,
   isPast,
   formatDateRange,
   type SchoolType,
   type EventType,
   type SchoolEvent,
+  type SchoolYear,
 } from "@/lib/events"
 
 const V1_SCHOOL_NAMES = new Set(V1_SCHOOLS.map((s) => s.name))
@@ -90,15 +93,24 @@ const EVENT_TYPE_COLORS: Record<EventType, string> = {
   holiday: "bg-[#FAEEDA] text-[#633806]",
 }
 
+const INITIAL_VISIBLE = 5
+
 export default function Home() {
+  const [schoolYear, setSchoolYear] = useState<SchoolYear>(defaultSchoolYear)
   const [schoolType, setSchoolType] = useState<SchoolType | "all">("all")
   const [selectedSchool, setSelectedSchool] = useState<string>("all")
   const [selectedEventType, setSelectedEventType] = useState<EventType | "all">("all")
   const [openCalendarId, setOpenCalendarId] = useState<string | null>(null)
   const [showPast, setShowPast] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE)
   const [feedback, setFeedback] = useState("")
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+
+  function resetView() {
+    setShowPast(false)
+    setVisibleCount(INITIAL_VISIBLE)
+  }
 
   const filteredSchools = useMemo(
     () => (schoolType === "all" ? V1_SCHOOLS : V1_SCHOOLS.filter((s) => s.type === schoolType)),
@@ -108,7 +120,7 @@ export default function Home() {
   const events = useMemo(() => {
     const filtered = SEED_EVENTS.filter((e) => {
       if (!V1_SCHOOL_NAMES.has(e.school)) return false
-      if (!isInCurrentSchoolYear(e.date)) return false
+      if (!isInSchoolYear(e.date, schoolYear)) return false
       if (schoolType !== "all" && e.schoolType !== schoolType) return false
       if (schoolType === "local-public" && e.eventType !== "holiday") return false
       if (selectedSchool !== "all" && e.school !== selectedSchool) return false
@@ -121,7 +133,7 @@ export default function Home() {
     const future = real.filter((e) => !isPast(e.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     const past = real.filter((e) => isPast(e.date)).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     return { future: [...future, ...external], past }
-  }, [schoolType, selectedSchool, selectedEventType])
+  }, [schoolYear, schoolType, selectedSchool, selectedEventType])
 
   function collapseGroups(list: SchoolEvent[], allFiltered: SchoolEvent[]): DisplayEvent[] {
     if (selectedSchool !== "all") return list
@@ -138,7 +150,9 @@ export default function Home() {
   const allFiltered = useMemo(() => [...events.future, ...events.past], [events])
   const futureEvents = useMemo(() => collapseGroups(events.future, allFiltered), [events, selectedSchool])
   const pastEvents = useMemo(() => collapseGroups(events.past, allFiltered), [events, selectedSchool])
-  const displayEvents = useMemo(() => [...futureEvents, ...(showPast ? pastEvents : [])], [futureEvents, pastEvents, showPast])
+  const visibleFuture = useMemo(() => futureEvents.slice(0, visibleCount), [futureEvents, visibleCount])
+  const hasMore = futureEvents.length > visibleCount
+  const displayEvents = useMemo(() => [...visibleFuture, ...(showPast ? pastEvents : [])], [visibleFuture, pastEvents, showPast])
 
   // Show verification banner when any open day or enrollment events are in view
   const showVerifyingBanner = futureEvents.some(
@@ -149,6 +163,7 @@ export default function Home() {
     setSchoolType(val)
     setSelectedSchool("all")
     setSelectedEventType("all")
+    resetView()
   }
 
   async function handleFeedbackSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -172,6 +187,23 @@ export default function Home() {
         Open days, enrollment windows, and holidays — add any event to your calendar in one click.
       </p>
 
+      {/* School year tabs */}
+      <div className="flex gap-2 mb-5">
+        {SCHOOL_YEARS.map((year) => (
+          <button
+            key={year}
+            onClick={() => { setSchoolYear(year); resetView() }}
+            className={`text-sm px-4 py-1.5 rounded-full border transition-colors cursor-pointer ${
+              schoolYear === year
+                ? "bg-[#534AB7] text-white border-[#534AB7]"
+                : "bg-white text-[#888780] border-[#D3D1C7] hover:border-[#534AB7] hover:text-[#534AB7]"
+            }`}
+          >
+            {year}
+          </button>
+        ))}
+      </div>
+
       {/* Filters */}
       <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-2 sm:gap-3 mb-8">
         <select
@@ -187,7 +219,7 @@ export default function Home() {
 
         <select
           value={selectedSchool}
-          onChange={(e) => setSelectedSchool(e.target.value)}
+          onChange={(e) => { setSelectedSchool(e.target.value); resetView() }}
           className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7] w-full sm:w-auto"
         >
           <option value="all">All schools</option>
@@ -199,7 +231,7 @@ export default function Home() {
         {schoolType !== "local-public" && (
           <select
             value={selectedEventType}
-            onChange={(e) => setSelectedEventType(e.target.value as EventType | "all")}
+            onChange={(e) => { setSelectedEventType(e.target.value as EventType | "all"); resetView() }}
             className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7] w-full sm:w-auto"
           >
             <option value="all">All event types</option>
@@ -337,6 +369,16 @@ export default function Home() {
           )
         })}
       </div>
+
+      {/* Load more */}
+      {hasMore && (
+        <button
+          onClick={() => setVisibleCount((n) => n + INITIAL_VISIBLE)}
+          className="w-full mt-3 text-sm text-[#534AB7] border border-[#D3D1C7] rounded-xl px-4 py-3 bg-white hover:bg-[#EEEDFE] transition-colors cursor-pointer"
+        >
+          Show {Math.min(futureEvents.length - visibleCount, INITIAL_VISIBLE)} more
+        </button>
+      )}
 
       {/* Past events toggle */}
       {pastEvents.length > 0 && (

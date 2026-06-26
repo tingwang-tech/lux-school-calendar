@@ -61,12 +61,26 @@ export const LEVEL_LABELS: Record<Level, string> = {
   both: "All levels",
 }
 
-const SCHOOL_YEAR_START = new Date("2025-09-01")
-const SCHOOL_YEAR_END = new Date("2027-09-14")
+export const SCHOOL_YEARS = ["2025-26", "2026-27"] as const
+export type SchoolYear = typeof SCHOOL_YEARS[number]
+
+const YEAR_BOUNDS: Record<SchoolYear, [string, string]> = {
+  "2025-26": ["2025-09-01", "2026-09-14"],
+  "2026-27": ["2026-09-15", "2027-09-14"],
+}
+
+export function isInSchoolYear(dateStr: string, year: SchoolYear): boolean {
+  const d = new Date(dateStr + "T12:00:00")
+  const [start, end] = YEAR_BOUNDS[year]
+  return d >= new Date(start) && d <= new Date(end)
+}
+
+export function defaultSchoolYear(): SchoolYear {
+  return new Date() >= new Date("2026-07-01") ? "2026-27" : "2025-26"
+}
 
 export function isInCurrentSchoolYear(dateStr: string): boolean {
-  const d = new Date(dateStr + "T12:00:00")
-  return d >= SCHOOL_YEAR_START && d <= SCHOOL_YEAR_END
+  return isInSchoolYear(dateStr, "2025-26") || isInSchoolYear(dateStr, "2026-27")
 }
 
 export function isPast(dateStr: string): boolean {
