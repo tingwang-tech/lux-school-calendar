@@ -19,28 +19,33 @@ export default function Image() {
           background: "#FDFAF6",
           padding: "80px",
           textAlign: "center",
+          fontFamily: "serif",
         }}
       >
         <div
           style={{
-            fontSize: "24px",
-            color: "#534AB7",
-            fontWeight: 600,
-            letterSpacing: "0.05em",
-            textTransform: "uppercase",
-            marginBottom: "40px",
+            display: "flex",
+            gap: "0",
+            marginBottom: "48px",
+            borderRadius: "8px",
+            overflow: "hidden",
+            width: "72px",
+            height: "48px",
           }}
         >
-          school.orienting.lu
+          <div style={{ flex: 1, background: "#EF3340" }} />
+          <div style={{ flex: 1, background: "#FFFFFF" }} />
+          <div style={{ flex: 1, background: "#00A3E0" }} />
         </div>
 
         <div
           style={{
-            fontSize: "96px",
-            fontWeight: 800,
+            fontSize: "88px",
+            fontWeight: 700,
             color: "#2C2C2A",
             lineHeight: 1.05,
-            marginBottom: "40px",
+            marginBottom: "36px",
+            fontFamily: "sans-serif",
           }}
         >
           Luxembourg
@@ -50,9 +55,10 @@ export default function Image() {
 
         <div
           style={{
-            fontSize: "40px",
+            fontSize: "38px",
             color: "#534AB7",
             fontWeight: 500,
+            fontFamily: "sans-serif",
           }}
         >
           Never miss a date that matters.
