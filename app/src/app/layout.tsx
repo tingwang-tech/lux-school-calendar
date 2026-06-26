@@ -14,13 +14,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Luxembourg School Calendar",
-  description:
-    "Never miss a date that matters — all Luxembourg international school dates in one place.",
+  description: "Never miss a date that matters.",
   metadataBase: new URL("https://school.orienting.lu"),
   openGraph: {
     title: "Luxembourg School Calendar",
-    description:
-      "Never miss a date that matters — all Luxembourg international school dates in one place.",
+    description: "Never miss a date that matters.",
     url: "https://school.orienting.lu",
     siteName: "Luxembourg School Calendar",
     locale: "en_GB",
@@ -29,8 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Luxembourg School Calendar",
-    description:
-      "Never miss a date that matters — all Luxembourg international school dates in one place.",
+    description: "Never miss a date that matters.",
   },
 };
 

@@ -15,64 +15,44 @@ export default function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          alignItems: "flex-start",
+          alignItems: "center",
           background: "#FDFAF6",
-          padding: "80px 96px",
+          padding: "80px",
+          textAlign: "center",
         }}
       >
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "16px",
-            marginBottom: "48px",
+            fontSize: "24px",
+            color: "#534AB7",
+            fontWeight: 600,
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
+            marginBottom: "40px",
           }}
         >
-          <div
-            style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "12px",
-              background: "#534AB7",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "28px",
-            }}
-          >
-            📅
-          </div>
-          <span
-            style={{
-              fontSize: "20px",
-              color: "#534AB7",
-              fontWeight: 600,
-              letterSpacing: "0.02em",
-            }}
-          >
-            school.orienting.lu
-          </span>
+          school.orienting.lu
         </div>
 
         <div
           style={{
-            fontSize: "72px",
-            fontWeight: 700,
+            fontSize: "96px",
+            fontWeight: 800,
             color: "#2C2C2A",
-            lineHeight: 1.1,
-            marginBottom: "32px",
-            maxWidth: "900px",
+            lineHeight: 1.05,
+            marginBottom: "40px",
           }}
         >
-          Luxembourg School Calendar
+          Luxembourg
+          <br />
+          School Calendar
         </div>
 
         <div
           style={{
-            fontSize: "32px",
+            fontSize: "40px",
             color: "#534AB7",
             fontWeight: 500,
-            lineHeight: 1.4,
           }}
         >
           Never miss a date that matters.
