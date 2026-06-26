@@ -113,8 +113,6 @@ export default function Home() {
       if (schoolType === "local-public" && e.eventType !== "holiday") return false
       if (selectedSchool !== "all" && e.school !== selectedSchool) return false
       if (selectedEventType !== "all" && e.eventType !== selectedEventType) return false
-      // External calendar placeholders only show when a school-related filter is active
-      if (e.isExternalCalendar && schoolType === "all" && selectedSchool === "all") return false
       return true
     })
     // External calendar cards always go at the end (after real dated events)
