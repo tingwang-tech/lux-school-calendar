@@ -8,7 +8,7 @@ This solves a real gap: sites like atschool.lu publish dates passively. This pro
 
 ## Live URL
 
-https://lux-school-calendar.vercel.app
+https://school.orienting.lu
 
 ## Target audience
 
