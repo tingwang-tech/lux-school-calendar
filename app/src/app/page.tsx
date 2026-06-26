@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { track } from "@vercel/analytics"
 import {
   SEED_EVENTS,
   V1_SCHOOLS,
@@ -337,7 +338,11 @@ export default function Home() {
                       {isOpen && (
                         <div className="absolute right-0 top-9 z-10 bg-white border border-[#D3D1C7] rounded-xl shadow-sm py-1 min-w-[160px]">
                           <button
-                            onClick={() => { downloadIcs(event); setOpenCalendarId(null) }}
+                            onClick={() => {
+                              downloadIcs(event)
+                              setOpenCalendarId(null)
+                              track("add_to_calendar", { school: event.school, event_type: event.eventType, calendar: "apple" })
+                            }}
                             className="w-full text-left text-xs px-4 py-2 text-[#2C2C2A] hover:bg-[#F1EFE8] transition-colors cursor-pointer"
                           >
                             🍎 Apple Calendar
@@ -346,7 +351,10 @@ export default function Home() {
                             href={googleCalendarUrl(event)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={() => setOpenCalendarId(null)}
+                            onClick={() => {
+                              setOpenCalendarId(null)
+                              track("add_to_calendar", { school: event.school, event_type: event.eventType, calendar: "google" })
+                            }}
                             className="block text-xs px-4 py-2 text-[#2C2C2A] hover:bg-[#F1EFE8] transition-colors"
                           >
                             📅 Google Calendar
