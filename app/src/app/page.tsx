@@ -432,6 +432,24 @@ export default function Home() {
         )}
       </div>
 
+      {/* Install prompt */}
+      <div className="border-t border-[#D3D1C7] pt-10 mt-10">
+        <h2 className="text-base font-medium text-[#2C2C2A] mb-1">Save to your phone</h2>
+        <p className="text-sm text-[#888780] mb-4">
+          Add this site to your home screen and open it like an app — no App Store needed.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 bg-[#F1EFE8] rounded-xl px-4 py-3">
+            <p className="text-xs font-medium text-[#2C2C2A] mb-1">iPhone (Safari)</p>
+            <p className="text-xs text-[#888780]">Tap the <span className="font-medium">Share</span> button at the bottom of the screen, then <span className="font-medium">Add to Home Screen</span>.</p>
+          </div>
+          <div className="flex-1 bg-[#F1EFE8] rounded-xl px-4 py-3">
+            <p className="text-xs font-medium text-[#2C2C2A] mb-1">Android (Chrome)</p>
+            <p className="text-xs text-[#888780]">Tap the <span className="font-medium">⋮</span> menu at the top right, then <span className="font-medium">Add to Home Screen</span>.</p>
+          </div>
+        </div>
+      </div>
+
       <p className="text-xs text-[#B4B2A9] mt-12 leading-relaxed">
         Not affiliated with any listed school. All events are based on publicly available information.
         Always confirm details on the school&apos;s official site.
