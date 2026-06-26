@@ -110,10 +110,16 @@ export default function Home() {
       if (schoolType === "local-public" && e.eventType !== "holiday") return false
       if (selectedSchool !== "all" && e.school !== selectedSchool) return false
       if (selectedEventType !== "all" && e.eventType !== selectedEventType) return false
+      // External calendar placeholders only show when a school-related filter is active
+      if (e.isExternalCalendar && schoolType === "all" && selectedSchool === "all") return false
       return true
     })
-    const future = filtered.filter((e) => e.isExternalCalendar || !isPast(e.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    const past = filtered.filter((e) => !e.isExternalCalendar && isPast(e.date)).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    // External calendar cards always go at the end (after real dated events)
+    const real = filtered.filter((e) => !e.isExternalCalendar)
+    const external = filtered.filter((e) => e.isExternalCalendar)
+    const future = real.filter((e) => !isPast(e.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    const past = real.filter((e) => isPast(e.date)).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    return { future: [...future, ...external], past }
     return { future, past }
   }, [schoolType, selectedSchool, selectedEventType])
 

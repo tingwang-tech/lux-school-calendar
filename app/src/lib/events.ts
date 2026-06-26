@@ -125,8 +125,8 @@ const MEN_SCHOOLS = SCHOOLS.filter((s) => s.holidayCalendar === "MEN")
 // Placeholder events for schools with their own calendar — links to official calendar page
 const EXTERNAL_CALENDAR_EVENTS: SchoolEvent[] = SCHOOLS
   .filter((s) => s.holidayCalendar !== "MEN" && s.type !== "local-public")
-  .map((school) => ({
-    id: `hol-ext-${slugify(school.name)}`,
+  .map((school, idx) => ({
+    id: `hol-ext-${idx}-${slugify(school.name)}`,
     school: school.name,
     schoolType: school.type,
     eventType: "holiday" as EventType,
