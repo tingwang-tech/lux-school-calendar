@@ -62,7 +62,7 @@ export const LEVEL_LABELS: Record<Level, string> = {
 }
 
 const SCHOOL_YEAR_START = new Date("2025-09-01")
-const SCHOOL_YEAR_END = new Date("2026-09-14")
+const SCHOOL_YEAR_END = new Date("2027-09-14")
 
 export function isInCurrentSchoolYear(dateStr: string): boolean {
   const d = new Date(dateStr + "T12:00:00")
@@ -104,7 +104,7 @@ export function formatDateRange(date: string, endDate?: string): string {
 // MEN national holiday calendar — authoritative source for Luxembourg public schools
 // and international/public schools that follow the national calendar
 const MEN_SOURCE = "https://men.public.lu/en/vacances-scolaires.html"
-const MEN_VERIFIED = "2026-06-20"
+const MEN_VERIFIED = "2026-06-26"
 
 export type MenPeriod = {
   id: string
@@ -114,12 +114,20 @@ export type MenPeriod = {
 }
 
 export const MEN_PERIODS: MenPeriod[] = [
+  // 2025–2026
   { id: "allsaints-2526", name: "All Saints holidays", date: "2025-11-01", endDate: "2025-11-09" },
   { id: "xmas-2526", name: "Christmas holidays", date: "2025-12-20", endDate: "2026-01-04" },
   { id: "carnival-2526", name: "Carnival holidays", date: "2026-02-14", endDate: "2026-02-22" },
   { id: "easter-2526", name: "Easter holidays", date: "2026-03-28", endDate: "2026-04-12" },
   { id: "pentecost-2526", name: "Pentecost holidays", date: "2026-05-23", endDate: "2026-05-31" },
   { id: "summer-2526", name: "Summer holidays", date: "2026-07-16", endDate: "2026-09-14" },
+  // 2026–2027
+  { id: "allsaints-2627", name: "All Saints holidays", date: "2026-10-31", endDate: "2026-11-08" },
+  { id: "xmas-2627", name: "Christmas holidays", date: "2026-12-19", endDate: "2027-01-03" },
+  { id: "carnival-2627", name: "Carnival holidays", date: "2027-02-06", endDate: "2027-02-14" },
+  { id: "easter-2627", name: "Easter holidays", date: "2027-03-27", endDate: "2027-04-11" },
+  { id: "pentecost-2627", name: "Pentecost holidays", date: "2027-05-29", endDate: "2027-06-06" },
+  { id: "summer-2627", name: "Summer holidays", date: "2027-07-16", endDate: "2027-09-14" },
 ]
 
 const MEN_SCHOOLS = SCHOOLS.filter((s) => s.holidayCalendar === "MEN")
