@@ -17,27 +17,28 @@ export interface SchoolEvent {
   sourceUrl: string
   lastVerified: string
   menPeriodId?: string
+  isExternalCalendar?: boolean
 }
 
-export const SCHOOLS: { name: string; type: SchoolType; holidayCalendar: HolidayCalendar }[] = [
+export const SCHOOLS: { name: string; type: SchoolType; holidayCalendar: HolidayCalendar; calendarUrl: string }[] = [
   // International — private
-  { name: "ISL Luxembourg", type: "international", holidayCalendar: "own" },
-  { name: "St George's International School", type: "international", holidayCalendar: "own" },
-  { name: "OTR International School", type: "international", holidayCalendar: "own" },
-  { name: "Vauban – Lycée Français de Luxembourg", type: "international", holidayCalendar: "AEFE" },
+  { name: "ISL Luxembourg", type: "international", holidayCalendar: "own", calendarUrl: "https://www.islux.lu/pagecalpop.cfm?p=639&calview=grid&period=month" },
+  { name: "St George's International School", type: "international", holidayCalendar: "own", calendarUrl: "https://www.st-georges.lu/term-dates" },
+  { name: "OTR International School", type: "international", holidayCalendar: "own", calendarUrl: "https://otrschool.lu/admissions/" },
+  { name: "Vauban – Lycée Français de Luxembourg", type: "international", holidayCalendar: "AEFE", calendarUrl: "https://wp-old.vauban.lu/calendrier-scolaire/" },
   // International — public with international curriculum
-  { name: "Lycée – International School Michel Lucius", type: "international", holidayCalendar: "MEN" },
-  { name: "Ecole internationale Gaston Thorn", type: "international", holidayCalendar: "European" },
-  { name: "Lënster Lycée International School", type: "international", holidayCalendar: "MEN" },
-  { name: "École Internationale Anne Beffort", type: "international", holidayCalendar: "MEN" },
-  { name: "École Internationale de Differdange et Esch-sur-Alzette", type: "international", holidayCalendar: "European" },
-  { name: "École Internationale de Mondorf-les-Bains", type: "international", holidayCalendar: "MEN" },
-  { name: "Lycée Edward Steichen (LESC)", type: "international", holidayCalendar: "MEN" },
+  { name: "Lycée – International School Michel Lucius", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
+  { name: "Ecole internationale Gaston Thorn", type: "international", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
+  { name: "Lënster Lycée International School", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
+  { name: "École Internationale Anne Beffort", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
+  { name: "École Internationale de Differdange et Esch-sur-Alzette", type: "international", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
+  { name: "École Internationale de Mondorf-les-Bains", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
+  { name: "Lycée Edward Steichen (LESC)", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
   // European
-  { name: "European School Luxembourg I (Kirchberg)", type: "european", holidayCalendar: "European" },
-  { name: "European School Luxembourg II (Mamer)", type: "european", holidayCalendar: "European" },
+  { name: "European School Luxembourg I (Kirchberg)", type: "european", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
+  { name: "European School Luxembourg II (Mamer)", type: "european", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
   // Local public
-  { name: "Local public school (commune)", type: "local-public", holidayCalendar: "MEN" },
+  { name: "Local public school (commune)", type: "local-public", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
 ]
 
 export const SCHOOL_TYPE_LABELS: Record<SchoolType, string> = {
@@ -120,6 +121,25 @@ export const MEN_PERIODS: MenPeriod[] = [
 ]
 
 const MEN_SCHOOLS = SCHOOLS.filter((s) => s.holidayCalendar === "MEN")
+
+// Placeholder events for schools with their own calendar — links to official calendar page
+const EXTERNAL_CALENDAR_EVENTS: SchoolEvent[] = SCHOOLS
+  .filter((s) => s.holidayCalendar !== "MEN" && s.type !== "local-public")
+  .map((school) => ({
+    id: `hol-ext-${slugify(school.name)}`,
+    school: school.name,
+    schoolType: school.type,
+    eventType: "holiday" as EventType,
+    title: school.holidayCalendar === "European"
+      ? "European Schools calendar"
+      : school.holidayCalendar === "AEFE"
+      ? "French (AEFE) calendar"
+      : "School's own calendar",
+    date: "2025-11-01",
+    sourceUrl: school.calendarUrl,
+    lastVerified: MEN_VERIFIED,
+    isExternalCalendar: true,
+  }))
 
 function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 24).replace(/-$/, "")
@@ -471,4 +491,7 @@ export const SEED_EVENTS: SchoolEvent[] = [
   // ── MEN holiday events — auto-generated for all MEN-calendar schools ───────
   // Covers: Michel Lucius, LLIS, Anne Beffort, Mondorf, LESC, local public
   ...MEN_HOLIDAY_EVENTS,
+
+  // ── External calendar placeholders — schools with own/European/AEFE calendar
+  ...EXTERNAL_CALENDAR_EVENTS,
 ]

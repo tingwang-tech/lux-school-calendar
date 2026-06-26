@@ -93,6 +93,7 @@ export default function Home() {
   const [selectedSchool, setSelectedSchool] = useState<string>("all")
   const [selectedEventType, setSelectedEventType] = useState<EventType | "all">("all")
   const [openCalendarId, setOpenCalendarId] = useState<string | null>(null)
+  const [showPast, setShowPast] = useState(false)
   const [feedback, setFeedback] = useState("")
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -109,28 +110,34 @@ export default function Home() {
       if (schoolType === "local-public" && e.eventType !== "holiday") return false
       if (selectedSchool !== "all" && e.school !== selectedSchool) return false
       if (selectedEventType !== "all" && e.eventType !== selectedEventType) return false
+      // External calendar placeholders only show when a specific school is selected
+      if (e.isExternalCalendar && selectedSchool === "all") return false
       return true
     })
     const future = filtered.filter((e) => !isPast(e.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     const past = filtered.filter((e) => isPast(e.date)).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    return [...future, ...past]
+    return { future, past }
   }, [schoolType, selectedSchool, selectedEventType])
 
-  // When no school is selected, collapse MEN holiday duplicates into one card per period
-  const displayEvents = useMemo((): DisplayEvent[] => {
-    if (selectedSchool !== "all") return events
+  function collapseGroups(list: SchoolEvent[], allFiltered: SchoolEvent[]): DisplayEvent[] {
+    if (selectedSchool !== "all") return list
     const seen = new Set<string>()
-    return events.flatMap((event) => {
+    return list.flatMap((event) => {
       if (!event.menPeriodId) return [event]
       if (seen.has(event.menPeriodId)) return []
       seen.add(event.menPeriodId)
-      const schools = events.filter((e) => e.menPeriodId === event.menPeriodId).map((e) => e.school)
+      const schools = allFiltered.filter((e) => e.menPeriodId === event.menPeriodId).map((e) => e.school)
       return [{ ...event, groupedSchools: schools }]
     })
-  }, [events, selectedSchool])
+  }
+
+  const allFiltered = useMemo(() => [...events.future, ...events.past], [events])
+  const futureEvents = useMemo(() => collapseGroups(events.future, allFiltered), [events, selectedSchool])
+  const pastEvents = useMemo(() => collapseGroups(events.past, allFiltered), [events, selectedSchool])
+  const displayEvents = useMemo(() => [...futureEvents, ...(showPast ? pastEvents : [])], [futureEvents, pastEvents, showPast])
 
   // Show verification banner when any open day or enrollment events are in view
-  const showVerifyingBanner = displayEvents.some(
+  const showVerifyingBanner = futureEvents.some(
     (e) => e.eventType === "open-day" || e.eventType === "enrollment"
   )
 
@@ -155,18 +162,18 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-12">
+    <main className="max-w-2xl mx-auto px-4 py-6 md:py-12">
       <h1 className="text-2xl font-medium text-[#3C3489] mb-1">Luxembourg school dates</h1>
       <p className="text-sm text-[#888780] mb-8">
         Open days, enrollment windows, and holidays — add any event to your calendar in one click.
       </p>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-8">
+      <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-2 sm:gap-3 mb-8">
         <select
           value={schoolType}
           onChange={(e) => handleSchoolTypeChange(e.target.value as SchoolType | "all")}
-          className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7]"
+          className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7] w-full sm:w-auto"
         >
           <option value="all">All school types</option>
           {(["international", "european", "local-public"] as SchoolType[]).map((t) => (
@@ -177,7 +184,7 @@ export default function Home() {
         <select
           value={selectedSchool}
           onChange={(e) => setSelectedSchool(e.target.value)}
-          className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7]"
+          className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7] w-full sm:w-auto"
         >
           <option value="all">All schools</option>
           {filteredSchools.map((s) => (
@@ -189,7 +196,7 @@ export default function Home() {
           <select
             value={selectedEventType}
             onChange={(e) => setSelectedEventType(e.target.value as EventType | "all")}
-            className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7]"
+            className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7] w-full sm:w-auto"
           >
             <option value="all">All event types</option>
             <option value="open-day">{EVENT_TYPE_LABELS["open-day"]}</option>
@@ -208,7 +215,7 @@ export default function Home() {
       )}
 
       {/* Event cards */}
-      <div className="flex flex-col gap-3 mb-14">
+      <div className="flex flex-col gap-3">
         {displayEvents.length === 0 && (
           <div className="text-sm text-[#888780] bg-[#F1EFE8] rounded-xl px-5 py-6">
             No events for this selection yet — let us know below what you&apos;re looking for.
@@ -217,6 +224,29 @@ export default function Home() {
         {displayEvents.map((event) => {
           const past = isPast(event.date)
           const isOpen = openCalendarId === event.id
+
+          if (event.isExternalCalendar) {
+            return (
+              <div key={event.id} className="rounded-xl border px-5 py-4 bg-white border-[#D3D1C7]">
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${EVENT_TYPE_COLORS["holiday"]}`}>
+                    {EVENT_TYPE_LABELS["holiday"]}
+                  </span>
+                </div>
+                <p className="text-sm font-medium text-[#2C2C2A] mb-0.5">{event.title}</p>
+                <p className="text-sm text-[#888780] mb-2">{event.school}</p>
+                <a
+                  href={event.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-[#534AB7] hover:text-[#3C3489] transition-colors"
+                >
+                  See school calendar ↗
+                </a>
+              </div>
+            )
+          }
+
           return (
             <div
               key={event.id}
@@ -265,7 +295,8 @@ export default function Home() {
                         onClick={() => setOpenCalendarId(isOpen ? null : event.id)}
                         className="text-xs font-medium bg-[#534AB7] text-white rounded-lg px-3 py-1.5 hover:bg-[#3C3489] transition-colors cursor-pointer"
                       >
-                        + Add to calendar
+                        <span className="sm:hidden">+ Add</span>
+                        <span className="hidden sm:inline">+ Add to calendar</span>
                       </button>
                       {isOpen && (
                         <div className="absolute right-0 top-9 z-10 bg-white border border-[#D3D1C7] rounded-xl shadow-sm py-1 min-w-[160px]">
@@ -302,6 +333,18 @@ export default function Home() {
           )
         })}
       </div>
+
+      {/* Past events toggle */}
+      {pastEvents.length > 0 && (
+        <button
+          onClick={() => setShowPast((v) => !v)}
+          className="w-full mt-3 mb-10 text-sm text-[#888780] border border-[#D3D1C7] rounded-xl px-4 py-3 bg-[#F1EFE8] hover:bg-[#E8E6DF] transition-colors cursor-pointer text-left flex justify-between items-center"
+        >
+          <span>{showPast ? "Hide past events" : `Show ${pastEvents.length} past event${pastEvents.length === 1 ? "" : "s"}`}</span>
+          <span>{showPast ? "▲" : "▼"}</span>
+        </button>
+      )}
+      {pastEvents.length === 0 && <div className="mb-10" />}
 
       {/* Feedback */}
       <div className="border-t border-[#D3D1C7] pt-10">
