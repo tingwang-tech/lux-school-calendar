@@ -110,8 +110,6 @@ export default function Home() {
       if (schoolType === "local-public" && e.eventType !== "holiday") return false
       if (selectedSchool !== "all" && e.school !== selectedSchool) return false
       if (selectedEventType !== "all" && e.eventType !== selectedEventType) return false
-      // External calendar placeholders only show when a specific school is selected
-      if (e.isExternalCalendar && selectedSchool === "all") return false
       return true
     })
     const future = filtered.filter((e) => e.isExternalCalendar || !isPast(e.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -218,7 +216,7 @@ export default function Home() {
       <div className="flex flex-col gap-3">
         {displayEvents.length === 0 && (
           <div className="text-sm text-[#888780] bg-[#F1EFE8] rounded-xl px-5 py-6">
-            No events for this selection yet — let us know below what you&apos;re looking for.
+            No upcoming events for this selection. Dates are added as schools announce them.
           </div>
         )}
         {displayEvents.map((event) => {
@@ -348,9 +346,9 @@ export default function Home() {
 
       {/* Feedback */}
       <div className="border-t border-[#D3D1C7] pt-10">
-        <h2 className="text-base font-medium text-[#2C2C2A] mb-1">Tell us what you&apos;d want more of</h2>
+        <h2 className="text-base font-medium text-[#2C2C2A] mb-1">Tell us what you think</h2>
         <p className="text-sm text-[#888780] mb-4">
-          We&apos;re building this for parents like you. What&apos;s missing? What would make this more useful?
+          What do you like about this so far? What would make it more useful?
         </p>
         {submitted ? (
           <p className="text-sm text-[#3C3489] bg-[#EEEDFE] rounded-xl px-5 py-4">
