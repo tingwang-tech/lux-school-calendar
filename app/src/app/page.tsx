@@ -184,8 +184,13 @@ export default function Home() {
   return (
     <main className="max-w-2xl mx-auto px-4 py-6 md:py-12">
       <h1 className="text-2xl font-medium text-[#3C3489] mb-1">Luxembourg school dates</h1>
-      <p className="text-sm text-[#888780] mb-8">
+      <p className="text-sm text-[#888780] mb-2">
         Open days, enrollment windows, and holidays — add any event to your calendar in one click.
+      </p>
+      <p className="text-xs mb-8">
+        <a href="/import" className="text-[#534AB7] hover:text-[#3C3489] transition-colors">
+          Got a handout from your child&apos;s teacher? Import events →
+        </a>
       </p>
 
       {/* School year tabs */}
