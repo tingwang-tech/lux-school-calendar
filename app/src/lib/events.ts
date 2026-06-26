@@ -20,29 +20,31 @@ export interface SchoolEvent {
   isExternalCalendar?: boolean
 }
 
-export const SCHOOLS: { name: string; type: SchoolType; holidayCalendar: HolidayCalendar; calendarUrl: string }[] = [
-  // International — private
-  { name: "ISL Luxembourg", type: "international", holidayCalendar: "own", calendarUrl: "https://www.islux.lu/pagecalpop.cfm?p=639&calview=grid&period=month" },
-  { name: "St George's International School", type: "international", holidayCalendar: "own", calendarUrl: "https://www.st-georges.lu/term-dates" },
-  { name: "OTR International School", type: "international", holidayCalendar: "own", calendarUrl: "https://otrschool.lu/admissions/" },
-  { name: "Vauban – Lycée Français de Luxembourg", type: "international", holidayCalendar: "AEFE", calendarUrl: "https://wp-old.vauban.lu/calendrier-scolaire/" },
-  // International — public with international curriculum
+export const SCHOOLS: { name: string; type: SchoolType; holidayCalendar: HolidayCalendar; calendarUrl: string; v2?: boolean }[] = [
+  // Public international schools (V1)
   { name: "Lycée – International School Michel Lucius", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
-  { name: "Ecole internationale Gaston Thorn", type: "international", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
   { name: "Lënster Lycée International School", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
   { name: "École Internationale Anne Beffort", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
-  { name: "École Internationale de Differdange et Esch-sur-Alzette", type: "international", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
   { name: "École Internationale de Mondorf-les-Bains", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
   { name: "Lycée Edward Steichen (LESC)", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
-  // European
-  { name: "European School Luxembourg I (Kirchberg)", type: "european", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
-  { name: "European School Luxembourg II (Mamer)", type: "european", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
-  // Local public
+  { name: "Ecole internationale Gaston Thorn", type: "international", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
+  { name: "École Internationale de Differdange et Esch-sur-Alzette", type: "international", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
+  // Local public (V1)
   { name: "Local public school (commune)", type: "local-public", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
+  // V2 — private international
+  { name: "ISL Luxembourg", type: "international", holidayCalendar: "own", calendarUrl: "https://www.islux.lu/pagecalpop.cfm?p=639&calview=grid&period=month", v2: true },
+  { name: "St George's International School", type: "international", holidayCalendar: "own", calendarUrl: "https://www.st-georges.lu/term-dates", v2: true },
+  { name: "OTR International School", type: "international", holidayCalendar: "own", calendarUrl: "https://otrschool.lu/admissions/", v2: true },
+  { name: "Vauban – Lycée Français de Luxembourg", type: "international", holidayCalendar: "AEFE", calendarUrl: "https://wp-old.vauban.lu/calendrier-scolaire/", v2: true },
+  // V2 — European Schools (EU-funded, not Luxembourg public)
+  { name: "European School Luxembourg I (Kirchberg)", type: "european", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/", v2: true },
+  { name: "European School Luxembourg II (Mamer)", type: "european", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/", v2: true },
 ]
 
+export const V1_SCHOOLS = SCHOOLS.filter((s) => !s.v2)
+
 export const SCHOOL_TYPE_LABELS: Record<SchoolType, string> = {
-  international: "International schools",
+  international: "Public international schools",
   european: "European schools",
   "local-public": "Local public schools",
 }

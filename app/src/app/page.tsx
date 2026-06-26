@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import {
   SEED_EVENTS,
-  SCHOOLS,
+  V1_SCHOOLS,
   SCHOOL_TYPE_LABELS,
   EVENT_TYPE_LABELS,
   LEVEL_LABELS,
@@ -14,6 +14,8 @@ import {
   type EventType,
   type SchoolEvent,
 } from "@/lib/events"
+
+const V1_SCHOOL_NAMES = new Set(V1_SCHOOLS.map((s) => s.name))
 
 type DisplayEvent = SchoolEvent & { groupedSchools?: string[] }
 
@@ -99,12 +101,13 @@ export default function Home() {
   const [submitting, setSubmitting] = useState(false)
 
   const filteredSchools = useMemo(
-    () => (schoolType === "all" ? SCHOOLS : SCHOOLS.filter((s) => s.type === schoolType)),
+    () => (schoolType === "all" ? V1_SCHOOLS : V1_SCHOOLS.filter((s) => s.type === schoolType)),
     [schoolType]
   )
 
   const events = useMemo(() => {
     const filtered = SEED_EVENTS.filter((e) => {
+      if (!V1_SCHOOL_NAMES.has(e.school)) return false
       if (!isInCurrentSchoolYear(e.date)) return false
       if (schoolType !== "all" && e.schoolType !== schoolType) return false
       if (schoolType === "local-public" && e.eventType !== "holiday") return false
@@ -180,7 +183,7 @@ export default function Home() {
           className="text-sm border border-[#D3D1C7] rounded-lg px-3 py-2 bg-white text-[#2C2C2A] focus:outline-none focus:border-[#534AB7] w-full sm:w-auto"
         >
           <option value="all">All school types</option>
-          {(["international", "european", "local-public"] as SchoolType[]).map((t) => (
+          {(["international", "local-public"] as SchoolType[]).map((t) => (
             <option key={t} value={t}>{SCHOOL_TYPE_LABELS[t]}</option>
           ))}
         </select>
