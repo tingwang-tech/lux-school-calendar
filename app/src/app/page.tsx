@@ -114,8 +114,8 @@ export default function Home() {
       if (e.isExternalCalendar && selectedSchool === "all") return false
       return true
     })
-    const future = filtered.filter((e) => !isPast(e.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    const past = filtered.filter((e) => isPast(e.date)).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    const future = filtered.filter((e) => e.isExternalCalendar || !isPast(e.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    const past = filtered.filter((e) => !e.isExternalCalendar && isPast(e.date)).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     return { future, past }
   }, [schoolType, selectedSchool, selectedEventType])
 
