@@ -33,8 +33,8 @@ This is the authoritative list. Check this before adding or generating holiday e
 | École Internationale Anne Beffort | EIMAB | Public international | MEN | State-funded, Mersch |
 | École Internationale de Mondorf-les-Bains | EIMLB | Public international | MEN | State-funded, Mondorf |
 | Lycée Edward Steichen | LESC | Public international | MEN | State-funded, Clervaux; MEN except upper secondary (European) |
-| Ecole internationale Gaston Thorn | EIGT | Public international | European Schools | Accredited European School, run by Luxembourg City |
-| École Internationale de Differdange et Esch-sur-Alzette | EIDE | Public international | European Schools | Accredited European School, run by communes |
+| Ecole internationale Gaston Thorn | EIGT | Public international | MEN | Accredited European School, run by Luxembourg City |
+| École Internationale de Differdange et Esch-sur-Alzette | EIDE | Public international | MEN | Accredited European School, run by communes |
 | Local public school (commune) | — | Local public | MEN | All commune schools; MEN calendar is authoritative |
 
 **MEN calendar source:** https://men.public.lu/en/vacances-scolaires.html  
@@ -42,7 +42,7 @@ This is the authoritative list. Check this before adding or generating holiday e
 
 When MEN publishes a new school year calendar, all MEN-tagged schools above automatically get holidays generated. Add the new year's periods to `MEN_PERIODS` in `events.ts` and extend `SCHOOL_YEAR_END`.
 
-EIGT and EIDE follow the European Schools calendar. Their holiday dates need manual verification from the eursc.eu link above — they are currently shown as "See school calendar →" placeholder cards.
+EIGT and EIDE follow the MEN calendar (confirmed). They are now auto-generated alongside all other MEN-tagged schools.
 
 ### V2 — Private international schools (hidden, `v2: true` in events.ts)
 
@@ -77,11 +77,10 @@ Two categories shown (V1):
 **P0 (should be live):**
 - Open days — all V1 public international schools
 - Enrollment / application deadlines — not yet added (gap)
-- School holidays — MEN calendar for all MEN-tagged schools; placeholder links for EIGT and EIDE
+- School holidays — MEN calendar for all MEN-tagged schools (including EIGT and EIDE)
 
 **P1 (next phase):**
 - 2026–2027 school year MEN holidays
-- EIGT and EIDE actual holiday dates (from European Schools calendar)
 - Term start/end dates
 - Orientation / welcome days
 - Luxembourg national public holidays
@@ -112,7 +111,6 @@ Two categories shown (V1):
 - Source link on every card → exact school page, not homepage
 - Verification banner shown above open day / enrollment events
 - Past events within current school year: grayed, non-clickable
-- External calendar cards (EIGT, EIDE): no Add to Calendar, just "See school calendar →" link
 - Events outside current school year: not shown
 
 ## Data maintenance

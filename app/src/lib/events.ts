@@ -27,8 +27,8 @@ export const SCHOOLS: { name: string; type: SchoolType; holidayCalendar: Holiday
   { name: "École Internationale Anne Beffort", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
   { name: "École Internationale de Mondorf-les-Bains", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
   { name: "Lycée Edward Steichen (LESC)", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
-  { name: "Ecole internationale Gaston Thorn", type: "international", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
-  { name: "École Internationale de Differdange et Esch-sur-Alzette", type: "international", holidayCalendar: "European", calendarUrl: "https://www.eursc.eu/en/european-schools/school-year-calendar/" },
+  { name: "Ecole internationale Gaston Thorn", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
+  { name: "École Internationale de Differdange et Esch-sur-Alzette", type: "international", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
   // Local public (V1)
   { name: "Local public school (commune)", type: "local-public", holidayCalendar: "MEN", calendarUrl: "https://men.public.lu/en/vacances-scolaires.html" },
   // V2 — private international
@@ -76,7 +76,7 @@ export function isInSchoolYear(dateStr: string, year: SchoolYear): boolean {
 }
 
 export function defaultSchoolYear(): SchoolYear {
-  return new Date() >= new Date("2026-07-01") ? "2026-27" : "2025-26"
+  return new Date() >= new Date("2026-06-26") ? "2026-27" : "2025-26"
 }
 
 export function isInCurrentSchoolYear(dateStr: string): boolean {
