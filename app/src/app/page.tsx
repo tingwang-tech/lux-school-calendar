@@ -121,7 +121,6 @@ export default function Home() {
     const future = real.filter((e) => !isPast(e.date)).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     const past = real.filter((e) => isPast(e.date)).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     return { future: [...future, ...external], past }
-    return { future, past }
   }, [schoolType, selectedSchool, selectedEventType])
 
   function collapseGroups(list: SchoolEvent[], allFiltered: SchoolEvent[]): DisplayEvent[] {
